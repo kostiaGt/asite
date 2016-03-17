@@ -11,6 +11,11 @@ return [
     'bootstrap' => ['log'],
     'language' => 'ru-RU',
     'modules' => [
+           'treemanager' =>  [
+        'class' => '\kartik\tree\Module',
+               
+        // other module settings, refer detailed documentation
+    ],
         'access' => [
             'class' => 'mdm\admin\Module',
             'layout' => 'left-menu',

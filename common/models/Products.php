@@ -1,6 +1,4 @@
-<?php
-
-namespace common\models;
+<?php namespace common\models;
 
 use Yii;
 
@@ -9,11 +7,19 @@ use Yii;
  *
  * @property integer $id
  * @property string $name
- * @property integer $lengthType
- * @property string $language
+ * @property string $searchname
+ * @property string $url
+ * @property string $code
+ * @property double $price
+ * @property integer $length
+ * @property integer $status
+ * @property string $created_at
+ * @property string $updated_at
+ * @property string $deleted_at
  */
 class Products extends \yii\db\ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -22,15 +28,35 @@ class Products extends \yii\db\ActiveRecord
         return 'products';
     }
 
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => \yii\behaviors\TimestampBehavior::className(),
+                'value' => function () {
+                    return date('Y-m-d H:i:s');
+                },
+            ],
+            'UrlTranslitBehavor' => [
+                'class' => \common\behavors\UrlTranslitBehavor::className(),
+                'textFieldName' => 'name',
+                'urlFieldName' => 'url'
+            ]
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-          
-            [['name'], 'string', 'max' => 255],
-            [['language'], 'string', 'max' => 6]
+            [['name', 'code', 'status', 'price', 'length'], 'required'],
+            [['name', 'code'], 'unique'],
+            [['price'], 'number'],
+            [['length', 'status'], 'integer'],
+            [['created_at', 'updated_at', 'deleted_at'], 'safe'],
+            [['name', 'searchname', 'url', 'code'], 'string', 'max' => 255]
         ];
     }
 
@@ -42,8 +68,15 @@ class Products extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'name' => Yii::t('app', 'Name'),
-           
-            'language' => Yii::t('app', 'Language'),
+            'searchname' => Yii::t('app', 'Searchname'),
+            'url' => Yii::t('app', 'Url'),
+            'code' => Yii::t('app', 'Code'),
+            'price' => Yii::t('app', 'Price'),
+            'length' => Yii::t('app', 'Length'),
+            'status' => Yii::t('app', 'Status'),
+            'created_at' => Yii::t('app', 'Created At'),
+            'updated_at' => Yii::t('app', 'Updated At'),
+            'deleted_at' => Yii::t('app', 'Deleted At'),
         ];
     }
 
@@ -55,4 +88,16 @@ class Products extends \yii\db\ActiveRecord
     {
         return new ProductsQuery(get_called_class());
     }
+
+    public function statusList()
+    {
+        return [
+            Yii::t('app', 'Active'), // Активен
+            Yii::t('app', 'Out of stock'), // Снят с продажи
+            Yii::t('app', 'Sold'), // Продан
+            Yii::t('app', 'Expected on stock'), // Ожидается на складе
+        ];
+    }
+    
+   
 }

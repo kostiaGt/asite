@@ -41,6 +41,8 @@ return [
             'rules' => [
                 '/' => 'site/index',
                 '<controller:\w+>/<action:\w+>/' => '<controller>/<action>',
+                '/category/id/<id:\d+>' => '/category/detail',
+                '/product/id/<id:\d+>' => '/product/detail',
             ]
         ],
         'user' => [
