@@ -5,6 +5,7 @@ use yii\web\Controller;
 use common\models\Products;
 use yii\web\HttpException;
 use yii\helpers\Json;
+use common\models\LoginForm;
 
 /**
  * Description of BasketController
@@ -25,7 +26,19 @@ class BasketController extends Controller
 
     public function actionIndex()
     {
-        return $this->render('index');
+        $model = new LoginForm();
+        if (isset($_POST['add-order'])) {
+            if (!\Yii::$app->user->isGuest) {
+                return $this->redirect(['order/create']);
+            }
+
+            
+            if ($model->load(Yii::$app->request->post()) && $model->login()) {
+                return $this->redirect(['order/create']);
+            }
+        }
+
+        return $this->render('index', ['model'=>$model]);
     }
 
     public function actionAdd($id, $length)
@@ -82,18 +95,18 @@ class BasketController extends Controller
     {
         $length = Yii::$app->request->post('length');
         $session = Yii::$app->session->get('basket');
-        
+
         if (!empty($length) && $session) {
             $this->totalSumm = 0;
             $this->totalLength = 0;
-            
-            foreach ($length as $id=>$key) {
-                if (isset($session[$id]) && isset($session[$id]['length']))  {
+
+            foreach ($length as $id => $key) {
+                if (isset($session[$id]) && isset($session[$id]['length'])) {
                     $session[$id]['length'] = (int) $key;
-                    $session[$id]['summ'] = $session[$id]['price'] *  $session[$id]['length'];
+                    $session[$id]['summ'] = $session[$id]['price'] * $session[$id]['length'];
                 }
             }
-            
+
             Yii::$app->session->set('basket', $session);
             Yii::$app->session->set('basketTotal', ['summ' => $this->totalSumm, 'length' => $this->totalLength]);
         }
@@ -124,13 +137,13 @@ class BasketController extends Controller
             Yii::$app->session->set('basket', $session);
             $this->recount();
         }
-         return $this->redirect(['/basket']);
+        return $this->redirect(['/basket']);
     }
 
     public function actionClear()
     {
         Yii::$app->session->remove('basket');
         Yii::$app->session->remove('basketTotal');
-         return $this->redirect(['/basket']);
+        return $this->redirect(['/basket']);
     }
 }

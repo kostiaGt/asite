@@ -15,5 +15,19 @@ return [
             'thousandSeparator' => ' ',
             'currencyCode' => 'UAN',
         ],
+        
+        'mailer' => [
+                'class' => 'yii\swiftmailer\Mailer',
+                'viewPath' => '@common/mail',
+                'transport' => [
+                    'class' => 'Swift_MailTransport',
+                ],
+                'useFileTransport' => false,
+            ],
+
     ],
+    'params'=>[
+        'admin e-mail'=>'kostiaGt@ukr.net',
+        'webmaster e-mail'=>'kostiaGt@ukr.net',
+    ]
 ];
